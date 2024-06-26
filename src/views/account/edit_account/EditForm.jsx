@@ -2,7 +2,7 @@ import { ArrowLeftOutlined, CheckOutlined, LoadingOutlined } from '@ant-design/i
 import { CustomInput, CustomMobileInput } from '@/components/formik';
 import { ACCOUNT } from '@/constants/routes';
 import { Field, useFormikContext } from 'formik';
-import PropType from 'prop-types';
+import PropTypes from 'prop-types';
 import React from 'react';
 import { useHistory } from 'react-router-dom';
 
@@ -34,7 +34,7 @@ const EditForm = ({ isLoading, authProvider }) => {
         name="address"
         type="text"
         label="Address (Will be used for checkout)"
-        placeholder="#245 Brgy. Maligalig, Arayat Pampanga, Philippines"
+        placeholder="Store Alle 45, Copenhagen, Denmark"
         component={CustomInput}
         style={{ textTransform: 'capitalize' }}
       />
@@ -72,8 +72,8 @@ const EditForm = ({ isLoading, authProvider }) => {
 };
 
 EditForm.propTypes = {
-  isLoading: PropType.bool.isRequired,
-  authProvider: PropType.string.isRequired
+  isLoading: PropTypes.bool.isRequired,
+  authProvider: PropTypes.string.isRequired
 };
 
 export default EditForm;
