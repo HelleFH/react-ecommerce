@@ -33,13 +33,13 @@ const Home = () => {
         <div className="banner">
           <div className="banner-desc">
             <h1 className="text-thin">
-              <strong>See</strong>
-              &nbsp;everything with&nbsp;
-              <strong>Clarity</strong>
+              <strong>Fill</strong>
+              &nbsp;your space&nbsp;
+              <strong>with Art</strong>
             </h1>
             <p>
-              Buying eyewear should leave you happy and good-looking, with money in your pocket.
-              Glasses, sunglasses, and contacts—we’ve got your eyes covered.
+            Decorating your walls should leave you inspired and satisfied, without breaking the bank. Classic prints, vintage posters, and timeless art—we’ve got your walls covered.
+
             </p>
             <br />
             <Link to={SHOP} className="button">
