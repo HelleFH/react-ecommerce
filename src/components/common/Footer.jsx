@@ -18,7 +18,7 @@ const Footer = () => {
           <span>
             Developed by
             {' '}
-            <a href="https://github.com/jgudo">HELLE FRUERGAARD</a>
+            <a href="https://github.com/helleFH">HELLE FRUERGAARD</a>
           </span>
         </strong>
       </div>
@@ -33,7 +33,7 @@ const Footer = () => {
         <strong>
           <span>
             Fork this project &nbsp;
-            <a href="https://github.com/jgudo/ecommerce-react">HERE</a>
+            <a href="https://github.com/helleFH/ecommerce-react">HERE</a>
           </span>
         </strong>
       </div>
