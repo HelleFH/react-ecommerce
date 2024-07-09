@@ -15,7 +15,7 @@ const ProductsTable = ({ filteredProducts }) => (
           <h5>Brand</h5>
         </div>
         <div className="grid-col">
-          <h5>Price</h5>
+          <h5>Sizes & Prices</h5>
         </div>
         <div className="grid-col">
           <h5>Date Added</h5>

@@ -12,6 +12,11 @@ const BasketItem = ({ product }) => {
   const dispatch = useDispatch();
   const onRemoveFromBasket = () => dispatch(removeFromBasket(product.id));
 
+  const getSelectedPrice = () => {
+    const selectedSize = product.sizesAndPrices.find(sizePrice => sizePrice.size === product.selectedSize);
+    return selectedSize ? selectedSize.price * product.quantity : product.price * product.quantity;
+  };
+
   return (
     <div className="basket-item">
       <BasketItemControl product={product} />
@@ -42,20 +47,10 @@ const BasketItem = ({ product }) => {
                 mm
               </h5>
             </div>
-            <div>
-              <span className="spec-title">Color</span>
-              <div style={{
-                backgroundColor: product.selectedColor || product.availableColors[0],
-                width: '15px',
-                height: '15px',
-                borderRadius: '50%'
-              }}
-              />
-            </div>
           </div>
         </div>
         <div className="basket-item-price">
-          <h4 className="my-0">{displayMoney(product.price * product.quantity)}</h4>
+          <h4 className="my-0">{displayMoney(getSelectedPrice())}</h4>
         </div>
         <button
           className="basket-item-remove button button-border button-border-gray button-small"
@@ -80,14 +75,14 @@ BasketItem.propTypes = {
     description: PropType.string,
     keywords: PropType.arrayOf(PropType.string),
     selectedSize: PropType.string,
-    selectedColor: PropType.string,
-    imageCollection: PropType.arrayOf(PropType.string),
-    sizes: PropType.arrayOf(PropType.number),
+    sizesAndPrices: PropType.arrayOf(PropType.shape({
+      size: PropType.string,
+      price: PropType.number
+    })),
     image: PropType.string,
     imageUrl: PropType.string,
     isFeatured: PropType.bool,
     isRecommended: PropType.bool,
-    availableColors: PropType.arrayOf(PropType.string)
   }).isRequired
 };
 

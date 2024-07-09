@@ -23,6 +23,13 @@ const ProductItem = ({ product, isItemOnBasket, addToBasket }) => {
     if (addToBasket) addToBasket({ ...product, selectedSize: product.sizes[0] });
   };
 
+  const getHighestPrice = () => {
+    if (product.sizesAndPrices && product.sizesAndPrices.length > 0) {
+      return product.sizesAndPrices.reduce((max, sizePrice) => sizePrice.price > max ? sizePrice.price : max, product.sizesAndPrices[0].price);
+    }
+    return product.price;
+  };
+
   return (
     <SkeletonTheme color="#e1e1e1" highlightColor="#f2f2f2">
       <div
@@ -55,7 +62,7 @@ const ProductItem = ({ product, isItemOnBasket, addToBasket }) => {
               {product.brand || <Skeleton width={60} />}
             </p>
             <h4 className="product-card-price">
-              {product.price ? displayMoney(product.price) : <Skeleton width={40} />}
+              {product.sizesAndPrices ? displayMoney(getHighestPrice()) : <Skeleton width={40} />}
             </h4>
           </div>
         </div>
@@ -68,7 +75,6 @@ const ProductItem = ({ product, isItemOnBasket, addToBasket }) => {
             {itemOnBasket ? 'Remove from basket' : 'Add to basket'}
           </button>
         )}
-
       </div>
     </SkeletonTheme>
   );
@@ -80,8 +86,17 @@ ProductItem.defaultProps = {
 };
 
 ProductItem.propTypes = {
-  // eslint-disable-next-line react/forbid-prop-types
-  product: PropType.object.isRequired,
+  product: PropType.shape({
+    id: PropType.string,
+    name: PropType.string,
+    brand: PropType.string,
+    price: PropType.number,
+    sizesAndPrices: PropType.arrayOf(PropType.shape({
+      size: PropType.string,
+      price: PropType.number
+    })),
+    image: PropType.string,
+  }).isRequired,
   isItemOnBasket: PropType.func,
   addToBasket: PropType.func
 };

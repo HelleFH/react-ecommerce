@@ -1,5 +1,5 @@
 import { ArrowLeftOutlined, LoadingOutlined } from '@ant-design/icons';
-import { ColorChooser, ImageLoader, MessageDisplay } from '@/components/common';
+import { ImageLoader, MessageDisplay } from '@/components/common';
 import { ProductShowcaseGrid } from '@/components/product';
 import { RECOMMENDED_PRODUCTS, SHOP } from '@/constants/routes';
 import { displayMoney } from '@/helpers/utils';
@@ -10,7 +10,7 @@ import {
   useRecommendedProducts,
   useScrollTop
 } from '@/hooks';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Select from 'react-select';
 
@@ -23,7 +23,7 @@ const ViewProduct = () => {
 
   const [selectedImage, setSelectedImage] = useState(product?.image || '');
   const [selectedSize, setSelectedSize] = useState('');
-  const [selectedColor, setSelectedColor] = useState('');
+  const [price, setPrice] = useState(product?.price || 0);
 
   const {
     recommendedProducts,
@@ -31,25 +31,27 @@ const ViewProduct = () => {
     isLoading: isLoadingFeatured,
     error: errorFeatured
   } = useRecommendedProducts(6);
-  const colorOverlay = useRef(null);
 
   useEffect(() => {
-    setSelectedImage(product?.image);
+    if (product) {
+      setSelectedImage(product.image);
+      if (product.sizesAndPrices && product.sizesAndPrices.length > 0) {
+        const defaultSize = product.sizesAndPrices.reduce((max, sizePrice) => 
+          sizePrice.price > max.price ? sizePrice : max, product.sizesAndPrices[0]);
+        setSelectedSize(defaultSize.size);
+        setPrice(defaultSize.price);
+      }
+    }
   }, [product]);
 
   const onSelectedSizeChange = (newValue) => {
     setSelectedSize(newValue.value);
-  };
-
-  const onSelectedColorChange = (color) => {
-    setSelectedColor(color);
-    if (colorOverlay.current) {
-      colorOverlay.current.value = color;
-    }
+    const selected = product.sizesAndPrices.find((sizePrice) => sizePrice.size === newValue.value);
+    setPrice(selected.price);
   };
 
   const handleAddToBasket = () => {
-    addToBasket({ ...product, selectedColor, selectedSize: selectedSize || product.sizes[0] });
+    addToBasket({ ...product, selectedSize, price });
   };
 
   return (
@@ -91,7 +93,6 @@ const ViewProduct = () => {
               </div>
             )}
             <div className="product-modal-image-wrapper">
-              {selectedColor && <input type="color" disabled ref={colorOverlay} id="color-overlay" />}
               <ImageLoader
                 alt={product.name}
                 className="product-modal-image"
@@ -113,24 +114,14 @@ const ViewProduct = () => {
                 <br />
                 <Select
                   placeholder="--Select Size--"
+                  value={{ label: `${selectedSize} mm`, value: selectedSize }}
                   onChange={onSelectedSizeChange}
-                  options={product.sizes.sort((a, b) => (a < b ? -1 : 1)).map((size) => ({ label: `${size} mm`, value: size }))}
+                  options={product.sizesAndPrices.sort((a, b) => (a.size < b.size ? -1 : 1)).map((sizePrice) => ({ label: `${sizePrice.size} mm`, value: sizePrice.size }))}
                   styles={{ menu: (provided) => ({ ...provided, zIndex: 10 }) }}
                 />
               </div>
               <br />
-              {product.availableColors.length >= 1 && (
-                <div>
-                  <span className="text-subtle">Choose Color</span>
-                  <br />
-                  <br />
-                  <ColorChooser
-                    availableColors={product.availableColors}
-                    onSelectedColorChange={onSelectedColorChange}
-                  />
-                </div>
-              )}
-              <h1>{displayMoney(product.price)}</h1>
+              <h1>{displayMoney(price)}</h1>
               <div className="product-modal-action">
                 <button
                   className={`button button-small ${isItemOnBasket(product.id) ? 'button-border button-border-gray' : ''}`}

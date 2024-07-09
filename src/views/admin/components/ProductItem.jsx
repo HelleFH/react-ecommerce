@@ -57,7 +57,17 @@ const ProductItem = ({ product }) => {
             <span>{product.brand || <Skeleton width={50} />}</span>
           </div>
           <div className="grid-col">
-            <span>{product.price ? displayMoney(product.price) : <Skeleton width={30} />}</span>
+            <div>
+              {product.sizesAndPrices ? (
+                product.sizesAndPrices.map((sp, index) => (
+                  <div key={index}>
+                    <span>{`${sp.size} mm: ${displayMoney(sp.price)}`}</span>
+                  </div>
+                ))
+              ) : (
+                <Skeleton width={30} />
+              )}
+            </div>
           </div>
           <div className="grid-col">
             <span>
@@ -115,18 +125,19 @@ ProductItem.propTypes = {
     id: PropType.string,
     name: PropType.string,
     brand: PropType.string,
-    price: PropType.number,
+    sizesAndPrices: PropType.arrayOf(PropType.shape({
+      size: PropType.number,
+      price: PropType.number
+    })),
     maxQuantity: PropType.number,
     description: PropType.string,
     keywords: PropType.arrayOf(PropType.string),
     imageCollection: PropType.arrayOf(PropType.object),
-    sizes: PropType.arrayOf(PropType.string),
     image: PropType.string,
     imageUrl: PropType.string,
     isFeatured: PropType.bool,
     isRecommended: PropType.bool,
     dateAdded: PropType.number,
-    availableColors: PropType.arrayOf(PropType.string)
   }).isRequired
 };
 

@@ -2,7 +2,7 @@
 import { CheckOutlined, LoadingOutlined } from '@ant-design/icons';
 import { ImageLoader } from '@/components/common';
 import {
-  CustomColorInput, CustomCreatableSelect, CustomInput, CustomTextarea
+   CustomCreatableSelect, CustomInput, CustomTextarea
 } from '@/components/formik';
 import {
   Field, FieldArray, Form, Formik
@@ -26,10 +26,18 @@ const FormSchema = Yup.object().shape({
     .max(60, 'Product name must only be less than 60 characters.'),
   brand: Yup.string()
     .required('Brand name is required.'),
-  price: Yup.number()
-    .positive('Price is invalid.')
-    .integer('Price should be an integer.')
-    .required('Price is required.'),
+  sizesAndPrices: Yup.array()
+    .of(
+      Yup.object().shape({
+        size: Yup.number()
+          .positive('Size must be positive.')
+          .required('Size is required.'),
+        price: Yup.number()
+          .positive('Price must be positive.')
+          .required('Price is required.')
+      })
+    )
+    .min(1, 'At least one size and price is required.'),
   description: Yup.string()
     .required('Description is required.'),
   maxQuantity: Yup.number()
@@ -39,28 +47,21 @@ const FormSchema = Yup.object().shape({
   keywords: Yup.array()
     .of(Yup.string())
     .min(1, 'Please enter at least 1 keyword for this product.'),
-  sizes: Yup.array()
-    .of(Yup.number())
-    .min(1, 'Please enter a size for this product.'),
   isFeatured: Yup.boolean(),
   isRecommended: Yup.boolean(),
-  availableColors: Yup.array()
-    .of(Yup.string().required())
-    .min(1, 'Please add a default color for this product.')
 });
+
 
 const ProductForm = ({ product, onSubmit, isLoading }) => {
   const initFormikValues = {
     name: product?.name || '',
     brand: product?.brand || '',
-    price: product?.price || 0,
+    sizesAndPrices: product?.sizesAndPrices || [{ size: '', price: '' }],
     maxQuantity: product?.maxQuantity || 0,
     description: product?.description || '',
     keywords: product?.keywords || [],
-    sizes: product?.sizes || [],
     isFeatured: product?.isFeatured || false,
     isRecommended: product?.isRecommended || false,
-    availableColors: product?.availableColors || []
   };
 
   const {
@@ -75,15 +76,12 @@ const ProductForm = ({ product, onSubmit, isLoading }) => {
       onSubmit({
         ...form,
         quantity: 1,
-        // due to firebase function billing policy, let's add lowercase version
-        // of name here instead in firebase functions
         name_lower: form.name.toLowerCase(),
         dateAdded: new Date().getTime(),
         image: imageFile?.image?.file || product.imageUrl,
         imageCollection: imageFile.imageCollection
       });
     } else {
-      // eslint-disable-next-line no-alert
       alert('Product thumbnail image is required.');
     }
   };
@@ -135,16 +133,7 @@ const ProductForm = ({ product, onSubmit, isLoading }) => {
                 />
               </div>
               <div className="d-flex">
-                <div className="product-form-field">
-                  <Field
-                    disabled={isLoading}
-                    name="price"
-                    id="price"
-                    type="number"
-                    label="* Price"
-                    component={CustomInput}
-                  />
-                </div>
+              
                 &nbsp;
                 <div className="product-form-field">
                   <Field
@@ -170,26 +159,48 @@ const ProductForm = ({ product, onSubmit, isLoading }) => {
                   />
                 </div>
                 &nbsp;
-                <div className="product-form-field">
-                  <CustomCreatableSelect
-                    defaultValue={values.keywords.map((key) => ({ value: key, label: key }))}
-                    name="sizes"
-                    iid="sizes"
-                    type="number"
-                    isMulti
-                    disabled={isLoading}
-                    placeholder="Create/Select Sizes"
-                    label="* Sizes (Millimeter)"
-                  />
-                </div>
-              </div>
-              <div className="product-form-field">
-                <FieldArray
-                  name="availableColors"
-                  disabled={isLoading}
-                  component={CustomColorInput}
-                />
-              </div>
+                <label>* Sizes and Prices</label>
+  <FieldArray name="sizesAndPrices">
+    {({ remove, push }) => (
+      <>
+        {values.sizesAndPrices.map((item, index) => (
+          <div key={index} className="d-flex">
+            <Field
+              name={`sizesAndPrices.${index}.size`}
+              type="number"
+              placeholder="Size"
+              disabled={isLoading}
+              component={CustomInput}
+            />
+            &nbsp;
+            <Field
+              name={`sizesAndPrices.${index}.price`}
+              type="number"
+              placeholder="Price"
+              disabled={isLoading}
+              component={CustomInput}
+            />
+            &nbsp;
+            <button
+              type="button"
+              onClick={() => remove(index)}
+              disabled={isLoading}
+            >
+              Remove
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={() => push({ size: '', price: '' })}
+          disabled={isLoading}
+        >
+          Add Size and Price
+        </button>
+      </>
+    )}
+  </FieldArray>
+</div>
               <div className="product-form-field">
                 <span className="d-block padding-s">Image Collection</span>
                 {!isFileLoading && (
@@ -327,7 +338,6 @@ ProductForm.propTypes = {
     imageUrl: PropType.string,
     isFeatured: PropType.bool,
     isRecommended: PropType.bool,
-    availableColors: PropType.arrayOf(PropType.string)
   }).isRequired,
   onSubmit: PropType.func.isRequired,
   isLoading: PropType.bool.isRequired
