@@ -44,7 +44,7 @@ const BasketItem = ({ product }) => {
               <h5 className="my-0">
                 {product.selectedSize}
                 {' '}
-                mm
+                cm
               </h5>
             </div>
           </div>

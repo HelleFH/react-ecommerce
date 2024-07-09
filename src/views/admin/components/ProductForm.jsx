@@ -29,11 +29,9 @@ const FormSchema = Yup.object().shape({
   sizesAndPrices: Yup.array()
     .of(
       Yup.object().shape({
-        size: Yup.number()
-          .positive('Size must be positive.')
+        size: Yup.string()
           .required('Size is required.'),
-        price: Yup.number()
-          .positive('Price must be positive.')
+        price: Yup.string()
           .required('Price is required.')
       })
     )
@@ -167,7 +165,7 @@ const ProductForm = ({ product, onSubmit, isLoading }) => {
           <div key={index} className="d-flex">
             <Field
               name={`sizesAndPrices.${index}.size`}
-              type="number"
+              type="string"
               placeholder="Size"
               disabled={isLoading}
               component={CustomInput}

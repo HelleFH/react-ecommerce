@@ -61,7 +61,7 @@ const ProductItem = ({ product }) => {
               {product.sizesAndPrices ? (
                 product.sizesAndPrices.map((sp, index) => (
                   <div key={index}>
-                    <span>{`${sp.size} mm: ${displayMoney(sp.price)}`}</span>
+                    <span>{`${sp.size} cm: ${displayMoney(sp.price)}`}</span>
                   </div>
                 ))
               ) : (
@@ -126,7 +126,7 @@ ProductItem.propTypes = {
     name: PropType.string,
     brand: PropType.string,
     sizesAndPrices: PropType.arrayOf(PropType.shape({
-      size: PropType.number,
+      size: PropType.string,
       price: PropType.number
     })),
     maxQuantity: PropType.number,
